@@ -1,0 +1,138 @@
+/* General */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f6fa;
+    color: #333;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Menú principal */
+div#menu-principal {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #007bff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+div#directorios-principales {
+    color: #fff;
+    font-weight: bold;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+div#directorios-principales button {
+    background-color: #fff;
+    color: #007bff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+div#directorios-principales button:hover {
+    background-color: #0056b3;
+    color: #fff;
+}
+
+/* Contenido dinámico */
+div#contenido {
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    min-height: 300px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+}
+
+
+div#directorios-principales button.active {
+    background-color: #0056b3;
+    color: #fff;
+    font-weight: bold;
+    outline: none;
+}
+
+
+/* Botones de interacción */
+.toggle-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-button:hover {
+    background-color: #0056b3;
+}
+
+/* Detalles */
+details {
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+details summary {
+    font-weight: bold;
+    color: #007bff;
+}
+
+details[open] summary {
+    color: #0056b3;
+}
+
+/* Archivos */
+.file a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.file a:hover {
+    text-decoration: underline;
+}
+
+/* Iframes */
+iframe {
+    width: 100%;
+    height: 500px;
+    border: none;
+    margin-top: 10px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    #directorios-principales {
+        flex-direction: column;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    .toggle-button, #directorios-principales button {
+        width: 100%;
+    }
+}
