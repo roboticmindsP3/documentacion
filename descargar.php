@@ -43,7 +43,7 @@ function is_user_enrolled_in_course($userid, $courseid) {
 }
 
 // Define la ruta base al directorio deseado
-$base_path = '/var/www/vhosts/plataforma.roboticminds.ec/doc_doce/mod/';
+$base_path = $CFG->documentacionroot . '/mod/';
 
 // Obtener el archivo solicitado y otras variables de la URL
 $file = isset($_GET['file']) ? $_GET['file'] : '';

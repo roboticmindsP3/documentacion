@@ -49,7 +49,7 @@ function is_user_enrolled_in_course($userid, $courseid) {
 global $USER;
 $userid = $USER->id;
 // Define la ruta base al directorio deseado
-$base_path = '/var/www/vhosts/plataforma.roboticminds.ec/doc_doce/mod/'; // Ruta base corregida
+$base_path = $CFG->documentacionroot . '/mod/'; // Ruta base corregida
 
 
 // Encabezado HTML
@@ -159,11 +159,11 @@ if (!empty($_GET)) {
 			if (in_array($curso_codigo, $a)) {
 				// Construir la ruta al directorio usando la ruta base definida
 				$ruta_directorio = rtrim($base_path, '/') . '/' . $modalidad . '/' . $a[0] . '/' . $estudiante_docente;
-				$mostrar_directamente = false;
+				$mostrar_directamente = true;
 			} else {
 				// Construir la ruta al directorio usando la ruta base definida
 				$ruta_directorio = rtrim($base_path, '/') . '/' . $modalidad . '/' . $curso_codigo . '/' . $estudiante_docente;
-				$mostrar_directamente = false;
+				$mostrar_directamente = true;
 			}
 
 

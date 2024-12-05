@@ -7,7 +7,7 @@ if (isloggedin()) {
     die('Acceso denegado');
 }
 
-$base_path = '/var/www/vhosts/plataforma.roboticminds.ec/doc_doce/mod/guias_2024';
+$base_path = $CFG->documentacionroot . '/mod/guias_2024';
 
 if (isset($_GET['file'])) {
     $file = basename(rawurldecode($_GET['file']));

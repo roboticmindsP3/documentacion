@@ -70,7 +70,7 @@
     }
 
     // Mostrar la lista de PDFs disponibles
-    $base_dir = '/var/www/vhosts/plataforma.roboticminds.ec/doc_doce/mod/guias_2024';
+    $base_dir = $CFG->documentacionroot . '/mod/guias_2024';
 
     if (is_dir($base_dir)) {
     if ($dir = opendir($base_dir)) {

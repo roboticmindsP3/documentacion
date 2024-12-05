@@ -3,7 +3,7 @@ require_once(__DIR__ . '/../config.php');
 
 // Verificar si el usuario está autenticado
 require_login();
-$base_path = '/var/www/vhosts/plataforma.roboticminds.ec/doc_doce/mod/';
+$base_path = $CFG->documentacionroot . '/mod/';
 
 // Obtener la ruta del subdirectorio solicitada
 if (isset($_GET['path'])) {

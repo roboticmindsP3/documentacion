@@ -13,7 +13,7 @@ if (isloggedin()) {
 }
 
 // Ruta base donde están almacenados los PDFs
-$base_dir = '/var/www/vhosts/plataforma.roboticminds.ec/doc_doce/mod/guias_2024';
+$base_dir = $CFG->documentacionroot . '/mod/guias_2024';
 
 // Obtener el archivo desde la URL
 $file = isset($_GET['file']) ? basename($_GET['file']) : 'null';
