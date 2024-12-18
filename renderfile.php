@@ -19,12 +19,50 @@ $requested_path = str_replace('..','',$requested_path);
 $requested_path = str_replace('\\','',$requested_path);
 $requested_path = str_replace('//','/',$requested_path);
 
-$file_path = $base_path . '/' . $requested_path;
+session_start();
+require_once(__DIR__ . '/../config.php');
 
-if (!file_exists($file_path)) {
-    echo "El archivo no existe.";
-    exit;
+// Verificar si el usuario está autenticado
+if (!isloggedin()) {
+    header("HTTP/1.1 403 Forbidden");
+    exit("Acceso denegado.");
 }
+
+// Sanitizar el parámetro 'file' para mayor seguridad
+$requested_path = rawurldecode($_GET['file'] ?? '');
+$requested_path = str_replace(['..', '\\', '//'], '', $requested_path);
+$file_path = realpath($base_path . '/' . $requested_path);
+
+// Validar si el archivo existe y está dentro del directorio permitido
+if (!$file_path || strpos($file_path, $base_path) !== 0 || !file_exists($file_path)) {
+    header("HTTP/1.1 404 Not Found");
+    exit("Archivo no encontrado.");
+}
+
+// Configurar cabeceras para proteger la entrega
+$extension = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
+switch ($extension) {
+    case 'jpg': $content_type = 'image/jpeg'; break;
+    case 'png': $content_type = 'image/png'; break;
+    case 'gif': $content_type = 'image/gif'; break;
+    default: $content_type = 'application/octet-stream'; break;
+}
+
+header('Content-Type: ' . $content_type);
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Pragma: no-cache");
+header("Expires: 0");
+header('Content-Disposition: inline; filename="' . basename($file_path) . '"');
+
+// Entregar el archivo en bloques
+$block_size = 8192;
+$fp = fopen($file_path, 'rb');
+while (!feof($fp)) {
+    echo fread($fp, $block_size);
+    flush();
+}
+fclose($fp);
+exit;
 
 // Detectar extensión para elegir Content-Type
 $extension = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
