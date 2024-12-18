@@ -47,7 +47,7 @@
         }
     }
 
-       if (isloggedin()) {
+    if (isloggedin()) {
         $username = $USER->username;
     } else {
         $username = 'Invitado';
@@ -72,8 +72,7 @@
                     $nombre_visible = str_replace(['_', '-'], ' ', $nombre_visible);
 
                     if (array_key_exists($codigo_pdf, $guias_totales)) {
-                        $nombre_sin_ext = pathinfo($file, PATHINFO_FILENAME);
-                        echo "<li><a href='#' onclick='mostrarImagenes(\"" . htmlspecialchars($nombre_sin_ext) . "\")'>" . htmlspecialchars($nombre_visible) . "</a></li>";
+                        echo "<li><a href='#' onclick='mostrarImagenes(\"" . htmlspecialchars($codigo_pdf) . "\")'>" . htmlspecialchars($nombre_visible) . "</a></li>";
                         $pdfs_disponibles = true; 
                     }
                 }
@@ -93,6 +92,7 @@
     }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -101,25 +101,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visor de Imágenes</title>
     <style>
-        /* Tu CSS original + ajustes para imágenes y navegación overlay */
-        
-        #overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: black;
-            z-index: 9999;
-            opacity: 0.9;
-            color: white;
-            text-align: center;
-            font-size: 24px;
-            justify-content: center;
-            align-items: center;
-        }
-
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -128,6 +109,8 @@
             flex-direction: column;
             align-items: center;
             background-color: #f4f4f9;
+            user-select: none; /* Evitar selección de texto/imágenes */
+            -webkit-user-drag: none; /* Evitar arrastre en WebKit */
         }
 
         h2 {
@@ -170,7 +153,6 @@
             margin-top: 10px;
         }
 
-        /* Contenedor de las imágenes */
         #images-container {
             position: relative;
             width: 100%;
@@ -187,14 +169,30 @@
             display: none;
             justify-content: center;
             align-items: center;
+            user-select: none;
+            -webkit-user-drag: none;
         }
 
         .imagen-slide img {
             max-width: 90%;
             max-height: 90%;
-            object-fit: contain; /* Asegura que la imagen se ajuste sin deformarse */
+            object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        /* Capa superpuesta encima de la imagen */
+        .overlay-capa {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%;
+            background: transparent;
+            z-index: 9999; /* Encima de la imagen */
+            cursor: default;
         }
 
         #username {
@@ -211,26 +209,6 @@
             font-size: 18px;
             width: 100%;
             text-align: center;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(0, 123, 255, 0.3);
-            border-top: 4px solid #007BFF;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 10px;
-            display: none;
-        }
-
-        .spinner.hidden {
-            display: none;
-        }
-
-        @keyframes spin {
-            from {transform: rotate(0deg);}
-            to {transform: rotate(360deg);}
         }
 
         #loading {
@@ -253,7 +231,22 @@
             box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
         }
 
-        /* Navegación overlay estilo flechas a los lados */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 123, 255, 0.3);
+            border-top: 4px solid #007BFF;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        @keyframes spin {
+            from {transform: rotate(0deg);}
+            to {transform: rotate(360deg);}
+        }
+
         #navigation {
             position: absolute;
             top: 50%;
@@ -263,7 +256,7 @@
             transform: translateY(-50%);
             padding: 0 20px;
             box-sizing: border-box;
-            z-index: 20; /* por encima de la imagen */
+            z-index: 10000;
         }
 
         #prev-image, #next-image {
@@ -309,14 +302,6 @@
             z-index: 20;
         }
 
-        #page-info {
-            margin-top: 10px;
-            font-size: 16px;
-            color: #333;
-            text-align: center;
-        }
-
-        /* Responsividad para pantallas pequeñas */
         @media screen and (max-width: 768px) {
             #prev-image, #next-image {
                 width: 35px;
@@ -328,7 +313,6 @@
             }
         }
 
-        /* Ajuste adicional para pantallas muy pequeñas */
         @media screen and (max-width: 480px) {
             #prev-image, #next-image {
                 width: 30px;
@@ -339,15 +323,15 @@
                 font-size: 14px;
             }
         }
+
     </style>
 </head>
 <body>
-    <!-- Contenedor de Imágenes -->
     <div id="pdf-container">
         <div id="username"><?php echo htmlspecialchars($username); ?></div>
         <div id="loading">
             <div class="spinner"></div>
-            <span>Escoja una guía...</span>
+            <span>Seleccione una guia </span>
         </div>
         <div id="navigation" style="display: none;">
             <button id="prev-image"></button>
@@ -357,17 +341,13 @@
         <div id="page-indicator">Pag 01</div>
     </div>
 
-    <div id="page-info">
-        <p>Página: <span id="page-num"></span> / <span id="page-count"></span></p>
-    </div>
-
     <script>
         var imagenActual = 0;
         var imagenes = []; 
         var totalSlides = 0;
 
         function mostrarImagenes(folderName) {
-            showLoading("Cargando imágenes...");
+            showLoading("Cargando...");
 
             var xhr = new XMLHttpRequest();
             xhr.open('GET', 'list_images.php?folder=' + encodeURIComponent(folderName), true);
@@ -381,29 +361,86 @@
                     imagesContainer.innerHTML = '';
 
                     if (totalSlides > 0) {
-                        imagenes.forEach(function(imgUrl, index) {
+                        imagenes.forEach(function(parts, index) {
                             var imgDiv = document.createElement('div');
                             imgDiv.className = 'imagen-slide';
-                            imgDiv.style.display = (index === 0) ? 'flex' : 'none'; // Muestra la primera imagen, escondemos el resto
+                            imgDiv.style.display = (index === 0) ? 'flex' : 'none';
 
-                            var img = document.createElement('img');
-                            img.src = imgUrl;
-                            img.alt = 'Imagen ' + (index + 1);
-                            imgDiv.appendChild(img);
-                            imagesContainer.appendChild(imgDiv);
+                            unirPartesEnUna(parts, function(dataURL) {
+                                var img = document.createElement('img');
+                                img.src = dataURL;
+                                img.alt = 'Imagen ' + (index + 1);
+                                imgDiv.appendChild(img);
+
+                                // Agregamos la capa superpuesta
+                                var overlay = document.createElement('div');
+                                overlay.className = 'overlay-capa';
+                                imgDiv.appendChild(overlay);
+
+                                imagesContainer.appendChild(imgDiv);
+
+                                if (index === totalSlides - 1) {
+                                    actualizarIndicador();
+                                    document.getElementById('navigation').style.display = 'flex';
+                                    hideLoading();
+                                }
+                            });
                         });
-
-                        actualizarIndicador();
-                        document.getElementById('navigation').style.display = 'flex';
                     } else {
                         imagesContainer.innerHTML = '<p>No hay imágenes disponibles.</p>';
                         document.getElementById('navigation').style.display = 'none';
+                        hideLoading();
                     }
-
-                    hideLoading();
                 }
             };
             xhr.send();
+        }
+
+        // Función para unir partes usando fetch + blob + canvas
+        function unirPartesEnUna(parts, callback) {
+            var loadedImages = [];
+            var count = 0;
+            var total = parts.length;
+
+            parts.forEach(function(url, i) {
+                fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    var objectURL = URL.createObjectURL(blob);
+                    var image = new Image();
+                    image.onload = function() {
+                        loadedImages[i] = image;
+                        URL.revokeObjectURL(objectURL);
+                        count++;
+                        if (count === total) {
+                            crearImagenUnica(loadedImages, callback);
+                        }
+                    };
+                    image.src = objectURL;
+                });
+            });
+        }
+
+        function crearImagenUnica(images, callback) {
+            var height = images[0].height;
+            var widthTotal = 0;
+            images.forEach(function(img) {
+                widthTotal += img.width;
+            });
+
+            var canvas = document.createElement('canvas');
+            canvas.width = widthTotal;
+            canvas.height = height;
+            var ctx = canvas.getContext('2d');
+
+            var x = 0;
+            images.forEach(function(img) {
+                ctx.drawImage(img, x, 0);
+                x += img.width;
+            });
+
+            var dataURL = canvas.toDataURL('image/png');
+            callback(dataURL);
         }
 
         function showPrevImage() {
@@ -449,28 +486,18 @@
         document.getElementById('prev-image').addEventListener('click', showPrevImage);
         document.getElementById('next-image').addEventListener('click', showNextImage);
 
-        function showLoading(text = "Cargando...", showSpinner = true) {
+        function showLoading(text = "Cargando...") {
             var loadingElement = document.getElementById('loading');
-            var spinnerElement = loadingElement.querySelector('.spinner');
             var loadingText = loadingElement.querySelector('span');
-
-            if (loadingText) {
-                loadingText.textContent = text;
-            }
-
-            if (spinnerElement) {
-                if (showSpinner) {
-                    spinnerElement.classList.remove('hidden');
-                } else {
-                    spinnerElement.classList.add('hidden');
-                }
-            }
-
+            var spinnerElement = loadingElement.querySelector('.spinner');
+            if (loadingText) loadingText.textContent = text;
+            if (spinnerElement) spinnerElement.style.display = 'block';
             loadingElement.style.display = 'flex';
         }
 
         function hideLoading() {
-            document.getElementById('loading').style.display = 'none';
+            var loadingElement = document.getElementById('loading');
+            if (loadingElement) loadingElement.style.display = 'none';
         }
 
         window.onload = function() {
